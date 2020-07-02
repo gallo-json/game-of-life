@@ -1,5 +1,5 @@
 public class Grid {
-    private static final int GRID_SIZE = 25;
+    private static final int GRID_SIZE = 30;
 
     private Tile[][] grid = new Tile[GRID_SIZE][GRID_SIZE];
     private Tile[][] nextGrid = grid.clone();
@@ -10,26 +10,38 @@ public class Grid {
         }
     }
 
-    private Tile[] countNeighbors(int x, int y) {
-        // Will clean this up later
+    private int countNeighbors(int x, int y) {
+        int count = 0;
+        for(int i = y - 1; i < y + 2; i++){
+            if(i < 0 || i >= grid.length) continue;
+            for(int j = x - 1; j < x + 2; j++){
+                if (j < 0 || j >= grid[i].length || (x == j && y == i)) continue;
+                if (grid[j][i].getState()) count++;
+            }
+        }
+        return count;
+    }
 
-        Tile[] neighbors = {
-                            grid[x-1][y-1], grid[x][y-1], grid[x+1][y-1],
-                            grid[x-1][y],                 grid[x+1][y],
-                            grid[x-1][y+1], grid[x][y+1], grid[x+1][y+1]
-                        };
+    public void update() {
+        for (int i = 0; i < GRID_SIZE; i++) {
+            for (int j = 0; j < GRID_SIZE; j++) {
+                int alive = countNeighbors(i, j);
 
-        return neighbors;
+                // Rules
+                if (grid[i][j].getState() && (alive < 2 || alive > 3)) nextGrid[i][j].setState(false);
+                else if (!grid[i][j].getState() && alive == 3) nextGrid[i][j].setState(true);
+                else nextGrid[i][j].setState(grid[i][j].getState());
+            }
+        }
+
+        grid = nextGrid.clone();
     }
 
     public void show() {
         for (Tile[] x : grid) { 
-            for (Tile y : x) System.out.print(y.show() + " ");
+            for (Tile y : x) System.out.printf("%s ", y.show());
             System.out.println();
         }
         System.out.println();
-
-        //Test
-        for (Tile x : countNeighbors(1, 1)) System.out.print(x.show() + " ");
     }
 }

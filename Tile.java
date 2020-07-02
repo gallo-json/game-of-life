@@ -9,11 +9,11 @@ public class Tile {
         return state;
     }
 
-    public void setState() {
-        state = !state;
+    public void setState(boolean state) {
+        this.state = state;
     }
 
     public String show() {
-        return state ? "X" : "-";
+        return state ? "X" : " ";
     }
 }
