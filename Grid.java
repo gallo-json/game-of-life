@@ -1,10 +1,12 @@
 public class Grid {
     private static final int GRID_SIZE = 30;
 
+    // Alternate between grid and nextGrid instead of creating new arrays every time
     private Tile[][] grid = new Tile[GRID_SIZE][GRID_SIZE];
     private Tile[][] nextGrid = grid.clone();
 
     public Grid() {
+        // Populate grid with random alive and dead tiles
         for (int row = 0; row < GRID_SIZE; ++row) {
             for (int col = 0; col < GRID_SIZE; ++col) grid[row][col] = new Tile(Math.random() > 0.5 ? true : false);
         }
@@ -28,8 +30,14 @@ public class Grid {
                 int alive = countNeighbors(i, j);
 
                 // Rules
+                // Any live cell with fewer than two live neighbours dies, as if by underpopulation. AND
+                // Any live cell with more than three live neighbours dies, as if by overpopulation.
                 if (grid[i][j].getState() && (alive < 2 || alive > 3)) nextGrid[i][j].setState(false);
-                else if (!grid[i][j].getState() && alive == 3) nextGrid[i][j].setState(true);
+
+                // Any live cell with two or three live neighbours lives on to the next generation.
+                else if (!grid[i][j].getState() && (alive == 3)) nextGrid[i][j].setState(true);
+
+                // All other live cells die in the next generation. Similarly, all other dead cells stay dead.
                 else nextGrid[i][j].setState(grid[i][j].getState());
             }
         }
